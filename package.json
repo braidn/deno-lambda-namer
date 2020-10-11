@@ -1,6 +1,7 @@
 {
   "name": "deno-lambda",
   "version": "0.1.0",
+  "licence": "UNLICENSED",
   "bin": {
     "deno-lambda": "bin/deno-lambda.js"
   },
