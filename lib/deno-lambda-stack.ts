@@ -1,6 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda'
-import * as gateway from '@aws-cdk/aws-apigateway'
+import * as gateway from '@aws-cdk/aws-apigatewayv2'
 import { CfnOutput } from '@aws-cdk/core';
 
 export class DenoLambdaStack extends cdk.Stack {
@@ -14,17 +14,25 @@ export class DenoLambdaStack extends cdk.Stack {
       description: 'Layer for running executing code on the Deno runtime'
     })
 
-    const testing = new lambda.Function(this, 'DenoTestFn', {
+    const humi = new lambda.Function(this, 'DenoHumiLocator', {
       runtime: lambda.Runtime.PROVIDED,
       code: lambda.Code.fromAsset('src/hello'),
       handler: 'kamal.handler',
       layers: [deno]
     })
 
-    const endpoint = new gateway.LambdaRestApi(this, 'DenoEndpoint', {
-      handler: testing
+    const humiIntegration = new gateway.LambdaProxyIntegration({
+      handler: humi
     })
 
-    new CfnOutput(this, 'endpointUrl', { value: endpoint.url }).toString()
+    const api = new gateway.HttpApi(this, 'HumiApi')
+
+    api.addRoutes({
+      path: '/kamal',
+      methods: [gateway.HttpMethod.GET],
+      integration: humiIntegration
+    });
+
+    new CfnOutput(this, 'endpointUrl', { value: api.url }).toString()
   }
 }
