@@ -1,0 +1,4 @@
+# @name GetAKamal
+# Make sure to have a proper HTTP_PATH variable set in .env
+GET {{$dotenv HTTP_PATH}}/kamal
+Content-Type: 'application/json'
